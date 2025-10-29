@@ -1,0 +1,15 @@
+{
+  "name": "github-timelines-electron-final",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "electron": "^26.0.0"
+  }
+}
