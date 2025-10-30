@@ -1,6 +1,6 @@
 :root { --muted: #9ca3af; }
 body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; padding:12px; }
-body.dark { background:#071029; color:#e6eef8; }
+body.dark { background:#071029; color:#e0e0e0; }
 body.light { background:#fff; color:#111; }
 header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
 .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -10,3 +10,22 @@ button { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; backgrou
 .repo-title { font-size:1.05rem; margin-bottom:8px; }
 .footer { font-size:12px; color:var(--muted); margin-top:12px; }
 svg { width:100%; }
+
+body.dark {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark .timeline,
+body.dark .repo-header,
+body.dark .repo-name,
+body.dark .issue,
+body.dark .issue a,
+body.dark .issue-label {
+  color: #e0e0e0 !important;
+  fill: #e0e0e0 !important;
+}
+
+body.dark .issue rect {
+  stroke: #bbb;
+}

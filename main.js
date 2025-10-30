@@ -4,6 +4,10 @@ const fetch = require('node-fetch');
 
 const CLIENT_ID = "Ov23li02k0fGu3YfPoL6";
 
+const keytar = require('keytar');
+const SERVICE_NAME = 'GitHub-Timelines';
+const ACCOUNT_NAME = 'user-access-token';
+
 let mainWindow;
 
 function createWindow() {
