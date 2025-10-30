@@ -5,6 +5,8 @@ let repoList = [];
 let repoIssues = {};
 let expandedState = {}; // Keeps track of which issue numbers are expanded
 let isLoading = false;
+let selectedRepoName = null;
+let selectedRepoScrollOffset = null;
 
 const oauthButton = document.getElementById('oauthButton');
 const patButton = document.getElementById('patButton');
@@ -61,6 +63,25 @@ window.electronAPI.onAuthSuccess(async (token) => {
   showLogoutButton();
   statusText.textContent = 'Restored previous session';
   await loadOrgData();
+});
+
+// --- Repo selection via click ---
+content.addEventListener('click', (ev) => {
+  const repoEl = ev.target.closest && ev.target.closest('[data-repo]');
+  if (!repoEl) return;
+
+  // Remove previous highlight
+  document.querySelectorAll('.timeline.repo-selected').forEach(el => el.classList.remove('repo-selected'));
+
+  // Add new highlight
+  repoEl.classList.add('repo-selected');
+  selectedRepoName = repoEl.getAttribute('data-repo');
+
+  // Save current scroll offset of that repo relative to content
+  const rect = repoEl.getBoundingClientRect();
+  const contentRect = content.getBoundingClientRect();
+  selectedRepoScrollOffset = rect.top - contentRect.top + content.scrollTop;
+  console.log('Selected repo', selectedRepoName, 'offset', selectedRepoScrollOffset);
 });
 
 themeSelect.addEventListener('change', ()=> {
@@ -143,8 +164,6 @@ async function listOrgRepos(org) {
     hasNext = conn.pageInfo.hasNextPage;
     after = conn.pageInfo.endCursor;
   }
-
-  all.map(r => {console.log(r)});
 
   return all.map(r => ({
     name: r.name,
@@ -302,12 +321,12 @@ function renderRepoTimeline(repoName, issues) {
       .style('cursor', d => (d.node.children && d.node.children.length) ? 'pointer' : 'default')
       .text(d => ((d.node.children && d.node.children.length) ? (d.node.expanded ? '▼ ' : '▶ ') : '   ') + `#${d.node.number} ${d.node.title}`)
       .on('click', (_,d) => {
-        if (d.node.children && d.node.children.length) {
-          d.node.expanded = !d.node.expanded;
-          expandedState[d.node.number] = d.node.expanded; // persist
-          update();
-        }
-      });
+      if (d.node.children && d.node.children.length) {
+        d.node.expanded = !d.node.expanded;
+        expandedState[d.node.number] = d.node.expanded; // persist
+        update();
+      }
+    });
   }
 
   update();
@@ -398,11 +417,32 @@ async function loadOrgData() {
 
 function rerenderAll() {
   if (isLoading) return;
+
+  // Capture scroll offset of the selected repo (if any)
+  let savedOffset = null;
+  if (selectedRepoName) {
+    const repoEl = document.querySelector(`[data-repo="${selectedRepoName}"]`);
+    if (repoEl) {
+      const repoTop = repoEl.offsetTop;
+      savedOffset = repoTop - content.scrollTop;
+    }
+  }
+
+  // Clear and re-render everything
   clearContent();
   for (const r of repoList) {
     const issues = repoIssues[r.name];
     if (issues) renderRepoTimeline(r.name, issues);
     else renderRepoPlaceholder(r);
+  }
+
+  // Restore scroll offset so selected repo stays in the same position
+  if (selectedRepoName) {
+    const repoEl = document.querySelector(`[data-repo="${selectedRepoName}"]`);
+    if (repoEl && savedOffset !== null) {
+      content.scrollTop = repoEl.offsetTop - savedOffset;
+      repoEl.classList.add('repo-selected');
+    }
   }
 }
 

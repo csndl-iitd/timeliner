@@ -1,5 +1,9 @@
 :root { --muted: #9ca3af; }
 body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; padding:12px; }
+/* Prevent body from scrolling (so header + content work together) */
+body {
+  overflow: hidden;
+}
 body.dark { background:#071029; color:#e0e0e0; }
 body.light { background:#fff; color:#111; }
 header {
@@ -22,12 +26,24 @@ header {
 button:not(#logout-btn) { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
 .intro { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-bottom:12px; }
 .timeline { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-bottom:14px; overflow:visible; }
+.timeline.repo-selected {
+  background: rgba(100, 181, 246, 0.2); /* subtle blue tint */
+  outline: 1px solid rgba(100, 181, 246, 0.4);
+  transition: background 0.3s ease;
+}
+body.dark .timeline.repo-selected {
+  background: rgba(80, 150, 255, 0.25);
+  outline: 1px solid rgba(120, 180, 255, 0.5);
+}
 .repo-title { font-size:1.05rem; margin-bottom:8px; }
 .footer { font-size:12px; color:var(--muted); margin-top:12px; }
 svg { width:100%; }
 
 #content {
-  padding-top: 70px; /* roughly equal to your header height */
+  padding-top: 70px; /* keep your header offset */
+  height: calc(100vh - 70px); /* fill remaining viewport below header */
+  overflow-y: auto;            /* enable scrolling */
+  overflow-x: hidden;
 }
 
 body.dark {
