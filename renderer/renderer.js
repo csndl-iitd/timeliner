@@ -13,11 +13,15 @@ const showClosed = document.getElementById('showClosed');
 const showNotPlanned = document.getElementById('showNotPlanned');
 const themeSelect = document.getElementById('theme');
 
-
+function hideAuthButtons() {
+  const authSection = document.getElementById('auth-section');
+  if (authSection) authSection.style.display = 'none';
+}
 
 // If token already exists (from main process), use it
 window.electronAPI.onAuthSuccess(async (token) => {
   TOKEN = token;
+  hideAuthButtons();
   statusDiv.textContent = 'Restored previous session';
   await loadOrgData();
 });
@@ -41,6 +45,7 @@ oauthButton.addEventListener('click', async ()=> {
     const token = await window.electronAPI.pollToken(deviceData);
     TOKEN = token;
     await window.electronAPI.saveToken(token);
+    hideAuthButtons();
     statusDiv.innerHTML = `<div style="color:lightgreen;font-weight:700;">Authorized successfully</div>`;
     await loadOrgData();
   } catch (e) {
