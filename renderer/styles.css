@@ -2,7 +2,22 @@
 body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; padding:12px; }
 body.dark { background:#071029; color:#e0e0e0; }
 body.light { background:#fff; color:#111; }
-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 24px); /* accounts for body padding:12px */
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--header-bg, rgba(255, 255, 255, 0.9));
+  backdrop-filter: blur(20px);
+  padding: 10px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 0px;
+}
 .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 button:not(#logout-btn) { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
 .intro { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-bottom:12px; }
@@ -10,6 +25,10 @@ button:not(#logout-btn) { padding:8px 10px; border-radius:6px; border:0; cursor:
 .repo-title { font-size:1.05rem; margin-bottom:8px; }
 .footer { font-size:12px; color:var(--muted); margin-top:12px; }
 svg { width:100%; }
+
+#content {
+  padding-top: 70px; /* roughly equal to your header height */
+}
 
 body.dark {
   background-color: #1e1e1e;
@@ -72,4 +91,15 @@ body.dark #logout-btn {
 
 #logout-btn:hover {
   opacity: 0.9;
+}
+
+body.light header {
+  --header-bg: rgba(255, 255, 255, 0.9);
+  color: #111;
+}
+
+body.dark header {
+  --header-bg: rgba(13, 17, 23, 0.85);
+  color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
 }

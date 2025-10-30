@@ -3,6 +3,7 @@ const ORG = 'csndl-iitd';
 let TOKEN = null;
 let repoList = [];
 let repoIssues = {};
+let expandedState = {}; // Keeps track of which issue numbers are expanded
 let isLoading = false;
 
 const oauthButton = document.getElementById('oauthButton');
@@ -143,6 +144,8 @@ async function listOrgRepos(org) {
     after = conn.pageInfo.endCursor;
   }
 
+  all.map(r => {console.log(r)});
+
   return all.map(r => ({
     name: r.name,
     updatedAt: r.updatedAt,
@@ -195,7 +198,10 @@ function renderRepoTimeline(repoName, issues) {
 
   // Build parent-child from subIssues nodes
   const nodesMap = new Map();
-  issues.forEach(i => nodesMap.set(i.number, Object.assign({}, i, { children: [], expanded: false })));
+  issues.forEach(i => {
+    const wasExpanded = expandedState[i.number] || false;
+    nodesMap.set(i.number, Object.assign({}, i, { children: [], expanded: wasExpanded }));
+  });
   issues.forEach(i => {
     (i.subIssues && i.subIssues.nodes || []).forEach(c => {
       const child = nodesMap.get(c.number);
@@ -295,7 +301,13 @@ function renderRepoTimeline(repoName, issues) {
       .attr('text-anchor','start')
       .style('cursor', d => (d.node.children && d.node.children.length) ? 'pointer' : 'default')
       .text(d => ((d.node.children && d.node.children.length) ? (d.node.expanded ? '▼ ' : '▶ ') : '   ') + `#${d.node.number} ${d.node.title}`)
-      .on('click', (_,d) => { if (d.node.children && d.node.children.length) { d.node.expanded = !d.node.expanded; update(); } });
+      .on('click', (_,d) => {
+        if (d.node.children && d.node.children.length) {
+          d.node.expanded = !d.node.expanded;
+          expandedState[d.node.number] = d.node.expanded; // persist
+          update();
+        }
+      });
   }
 
   update();
