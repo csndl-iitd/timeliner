@@ -8,6 +8,18 @@ const keytar = require('keytar');
 const SERVICE_NAME = 'GitHub-Timelines';
 const ACCOUNT_NAME = 'user-access-token';
 
+async function getStoredToken() {
+  return await keytar.getPassword(SERVICE_NAME, ACCOUNT_NAME);
+}
+
+async function storeToken(token) {
+  await keytar.setPassword(SERVICE_NAME, ACCOUNT_NAME, token);
+}
+
+async function clearToken() {
+  await keytar.deletePassword(SERVICE_NAME, ACCOUNT_NAME);
+}
+
 let mainWindow;
 
 function createWindow() {
@@ -19,7 +31,19 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  createWindow();
+
+  // Check for stored token after window loads
+  mainWindow.webContents.on('did-finish-load', async () => {
+    const savedToken = await getStoredToken();
+    if (savedToken) {
+      console.log('Found stored token, resuming session');
+      mainWindow.webContents.send('auth-success', savedToken);
+    }
+  });
+});
+
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 
 // Request device code and return it to renderer
@@ -65,3 +89,13 @@ ipcMain.handle('poll-token', async (_event, deviceData) => {
 
 ipcMain.handle('submit-pat', async (_ev, pat) => { return pat; });
 ipcMain.handle('open-external', (_ev, url) => shell.openExternal(url));
+
+ipcMain.handle('save-token', async (_event, token) => {
+  await storeToken(token);
+  return true;
+});
+
+ipcMain.handle('logout', async () => {
+  await clearToken();
+  return true;
+});

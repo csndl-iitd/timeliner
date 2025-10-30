@@ -13,6 +13,15 @@ const showClosed = document.getElementById('showClosed');
 const showNotPlanned = document.getElementById('showNotPlanned');
 const themeSelect = document.getElementById('theme');
 
+
+
+// If token already exists (from main process), use it
+window.electronAPI.onAuthSuccess(async (token) => {
+  TOKEN = token;
+  statusDiv.textContent = 'Restored previous session';
+  await loadOrgData();
+});
+
 themeSelect.addEventListener('change', ()=> {
   document.body.className = themeSelect.value;
   rerenderAll();
@@ -31,6 +40,7 @@ oauthButton.addEventListener('click', async ()=> {
     // poll for the token
     const token = await window.electronAPI.pollToken(deviceData);
     TOKEN = token;
+    await window.electronAPI.saveToken(token);
     statusDiv.innerHTML = `<div style="color:lightgreen;font-weight:700;">Authorized successfully</div>`;
     await loadOrgData();
   } catch (e) {
