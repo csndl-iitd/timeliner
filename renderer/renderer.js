@@ -113,17 +113,41 @@ async function graphqlFetch(query, variables={}) {
 }
 
 async function listOrgRepos(org) {
-  const q = `query($org:String!,$per:Int!,$after:String){organization(login:$org){repositories(first:$per,after:$after,orderBy:{field:UPDATED_AT,direction:DESC}){nodes{name updatedAt} pageInfo{hasNextPage endCursor}}}}`;
+  const q = `
+  query($org:String!,$per:Int!,$after:String){
+    organization(login:$org){
+      repositories(first:$per, after:$after, orderBy:{field:UPDATED_AT, direction:DESC}){
+        nodes{
+          name
+          updatedAt
+          issues(states:OPEN) {
+            totalCount
+          }
+        }
+        pageInfo{hasNextPage endCursor}
+      }
+    }
+  }`;
+
   const per = 50;
-  let all = []; let after = null; let hasNext = true;
+  let all = [];
+  let after = null;
+  let hasNext = true;
+
   while (hasNext) {
     const data = await graphqlFetch(q, { org, per, after });
     const conn = data.organization && data.organization.repositories;
     if (!conn) break;
     all.push(...conn.nodes);
-    hasNext = conn.pageInfo.hasNextPage; after = conn.pageInfo.endCursor;
+    hasNext = conn.pageInfo.hasNextPage;
+    after = conn.pageInfo.endCursor;
   }
-  return all;
+
+  return all.map(r => ({
+    name: r.name,
+    updatedAt: r.updatedAt,
+    openIssues: r.issues.totalCount
+  }));
 }
 
 async function getRepoIssuesWithSubIssues(owner, repo) {
@@ -281,17 +305,48 @@ function renderRepoTimeline(repoName, issues) {
 async function loadOrgData() {
   clearContent();
   isLoading = true;
-  content.appendChild(Object.assign(document.createElement('div'), { className: 'intro', textContent: 'Loading repositories...' }));
+
+  // Add both intro and sorting elements
+  const intro = Object.assign(document.createElement('div'), {
+    className: 'intro',
+    textContent: 'Loading repositories...'
+  });
+  const sortingMsg = Object.assign(document.createElement('div'), {
+    className: 'intro',
+    textContent: 'Sorting repositories...'
+  });
+  content.appendChild(intro);
+
+  let repos;
   try {
-    repoList = await listOrgRepos(ORG);
+    repos = await listOrgRepos(ORG);
   } catch (e) {
     clearContent();
-    content.appendChild(Object.assign(document.createElement('div'), { className: 'intro', textContent: 'Failed to list repositories: ' + (e.message || e) }));
+    content.appendChild(Object.assign(document.createElement('div'), {
+      className: 'intro',
+      textContent: 'Failed to list repositories: ' + (e.message || e)
+    }));
     isLoading = false;
     return;
   }
 
-  repoList.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  // Show sorting message and remove initial intro
+  content.removeChild(intro);
+  content.appendChild(sortingMsg);
+
+  // Sort before fetching issues (stable order)
+  repos.sort((a, b) => {
+    const aEmpty = a.openIssues === 0;
+    const bEmpty = b.openIssues === 0;
+    if (aEmpty && !bEmpty) return 1;
+    if (!aEmpty && bEmpty) return -1;
+    return new Date(b.updatedAt) - new Date(a.updatedAt);
+  });
+
+  // Remove sorting message and proceed
+  content.removeChild(sortingMsg);
+
+  repoList = repos;
   repoList.forEach(r => renderRepoPlaceholder(r));
 
   const concurrency = 4;
@@ -318,10 +373,15 @@ async function loadOrgData() {
     active.push(p);
   }
 
-  for (let i=0;i<concurrency;i++) runNext();
+  for (let i = 0; i < concurrency; i++) runNext();
   await Promise.all(active);
+
   isLoading = false;
-  const foot = document.createElement('div'); foot.className='footer'; foot.textContent='Done.'; content.appendChild(foot);
+
+  const foot = document.createElement('div');
+  foot.className = 'footer';
+  foot.textContent = 'Done.';
+  content.appendChild(foot);
 }
 
 function rerenderAll() {
