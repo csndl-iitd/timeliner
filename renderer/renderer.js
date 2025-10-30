@@ -7,22 +7,59 @@ let isLoading = false;
 
 const oauthButton = document.getElementById('oauthButton');
 const patButton = document.getElementById('patButton');
-const statusDiv = document.getElementById('status');
+const statusDiv = document.getElementById('status'); // keep for backward compat if used elsewhere
+const statusText = document.getElementById('statusText');
+const statusActions = document.getElementById('statusActions');
 const content = document.getElementById('content');
 const showClosed = document.getElementById('showClosed');
 const showNotPlanned = document.getElementById('showNotPlanned');
 const themeSelect = document.getElementById('theme');
+const authSection = document.getElementById('auth-section');
 
 function hideAuthButtons() {
-  const authSection = document.getElementById('auth-section');
   if (authSection) authSection.style.display = 'none';
+}
+
+function showLogoutButton() {
+  console.log('Showing logout button');
+  if (!statusActions) return;                 // safety
+  if (document.getElementById('logout-btn')) return; // avoid duplicates
+
+  const btn = document.createElement('button');
+  btn.id = 'logout-btn';
+  btn.textContent = 'Logout';
+  btn.style.marginLeft = '8px';
+  btn.style.padding = '4px 10px';
+  btn.style.border = '1px solid #888';
+  btn.style.borderRadius = '6px';
+  btn.style.cursor = 'pointer';
+  // adapt color for theme if you want
+  btn.onclick = async () => {
+    try {
+      await window.electronAPI.logout(); // or window.electronAPI.logout(), whatever you exposed
+    } catch (e) {
+      console.warn('Failed to clear token', e);
+    }
+    TOKEN = null;
+    // reset UI
+    statusText.textContent = 'Logged out';
+    clearContent();
+    // show auth buttons if you have an auth section
+    if (authSection) authSection.style.display = 'block';
+    // remove the button after logout
+    const existing = document.getElementById('logout-btn');
+    if (existing) existing.remove();
+  };
+
+  statusActions.appendChild(btn);
 }
 
 // If token already exists (from main process), use it
 window.electronAPI.onAuthSuccess(async (token) => {
   TOKEN = token;
   hideAuthButtons();
-  statusDiv.textContent = 'Restored previous session';
+  showLogoutButton();
+  statusText.textContent = 'Restored previous session';
   await loadOrgData();
 });
 
@@ -33,11 +70,11 @@ themeSelect.addEventListener('change', ()=> {
 
 oauthButton.addEventListener('click', async ()=> {
   oauthButton.disabled = true;
-  statusDiv.textContent = 'Requesting device code from GitHub...';
+  statusText.textContent = 'Requesting device code from GitHub...';
   try {
     const deviceData = await window.electronAPI.startOAuth();
     // show the user_code prominently
-    statusDiv.innerHTML = `<div><strong>Enter this code on GitHub:</strong></div>
+    statusText.innerHTML = `<div><strong>Enter this code on GitHub:</strong></div>
       <div style="font-size:20px;font-weight:700;background:#fff;color:#000;padding:8px;border-radius:6px;display:inline-block;margin-top:6px;">${deviceData.user_code}</div>
       <div style="margin-top:8px;">Open the browser window and enter the code, then approve the app. Waiting for authorization...</div>`;
 
@@ -46,22 +83,23 @@ oauthButton.addEventListener('click', async ()=> {
     TOKEN = token;
     await window.electronAPI.saveToken(token);
     hideAuthButtons();
-    statusDiv.innerHTML = `<div style="color:lightgreen;font-weight:700;">Authorized successfully</div>`;
+    showLogoutButton();
+    statusText.innerHTML = `<div style="color:lightgreen;font-weight:700;">Authorized successfully</div>`;
     await loadOrgData();
   } catch (e) {
     console.error('OAuth flow failed', e);
-    statusDiv.innerHTML = `<div style="color:#f88;">OAuth failed: ${e.message || e}</div>`;
+    statusText.innerHTML = `<div style="color:#f88;">OAuth failed: ${e.message || e}</div>`;
     oauthButton.disabled = false;
   }
 });
 
-patButton.addEventListener('click', async ()=> {
-  const t = prompt('Paste your GitHub Personal Access Token (scopes: repo, read:org)');
-  if (!t) return;
-  TOKEN = t.trim();
-  statusDiv.textContent = 'Authenticated (PAT)';
-  await loadOrgData();
-});
+// patButton.addEventListener('click', async ()=> {
+//   const t = prompt('Paste your GitHub Personal Access Token (scopes: repo, read:org)');
+//   if (!t) return;
+//   TOKEN = t.trim();
+//   statusText.textContent = 'Authenticated (PAT)';
+//   await loadOrgData();
+// });
 
 async function graphqlFetch(query, variables={}) {
   if (!TOKEN) throw new Error('No token');

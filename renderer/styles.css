@@ -29,3 +29,45 @@ body.dark .issue-label {
 body.dark .issue rect {
   stroke: #bbb;
 }
+
+#status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#statusText {
+  display: inline-block;
+}
+
+#statusActions {
+  display: inline-block;
+}
+
+/* ---- Logout button theme-aware styling ---- */
+#logout-btn {
+  background-color: var(--btn-bg, #444);
+  color: var(--btn-text, #fff);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#logout-btn:hover {
+  opacity: 0.85;
+}
+
+/* Light theme overrides */
+body.light #logout-btn {
+  background-color: #eee;
+  color: #222;
+}
+
+/* Dark theme overrides */
+body.dark #logout-btn {
+  background-color: #444;
+  color: #fff;
+}
