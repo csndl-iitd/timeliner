@@ -84,8 +84,18 @@ content.addEventListener('click', (ev) => {
   console.log('Selected repo', selectedRepoName, 'offset', selectedRepoScrollOffset);
 });
 
-themeSelect.addEventListener('change', ()=> {
-  document.body.className = themeSelect.value;
+// --- Theme Persistence ---
+// Load saved theme or default to 'light'
+const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const savedTheme = localStorage.ge
+document.body.className = savedTheme;
+themeSelect.value = savedTheme;
+
+// When user changes theme, save it
+themeSelect.addEventListener('change', () => {
+  const newTheme = themeSelect.value;
+  document.body.className = newTheme;
+  localStorage.setItem('theme', newTheme);
   rerenderAll();
 });
 
@@ -121,6 +131,15 @@ oauthButton.addEventListener('click', async ()=> {
 //   statusText.textContent = 'Authenticated (PAT)';
 //   await loadOrgData();
 // });
+
+window.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('header');
+  const content = document.getElementById('content');
+  if (header && content) {
+    const headerHeight = header.offsetHeight;
+    content.style.paddingTop = `${headerHeight + 20}px`; // +20 for comfortable spacing
+  }
+});
 
 async function graphqlFetch(query, variables={}) {
   if (!TOKEN) throw new Error('No token');
