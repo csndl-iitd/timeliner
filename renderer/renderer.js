@@ -21,7 +21,6 @@ function hideAuthButtons() {
 }
 
 function showLogoutButton() {
-  console.log('Showing logout button');
   if (!statusActions) return;                 // safety
   if (document.getElementById('logout-btn')) return; // avoid duplicates
 

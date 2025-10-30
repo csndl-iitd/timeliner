@@ -4,7 +4,7 @@ body.dark { background:#071029; color:#e0e0e0; }
 body.light { background:#fff; color:#111; }
 header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
 .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-button { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
+button:not(#logout-btn) { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
 .intro { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-bottom:12px; }
 .timeline { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-bottom:14px; overflow:visible; }
 .repo-title { font-size:1.05rem; margin-bottom:8px; }
@@ -45,29 +45,31 @@ body.dark .issue rect {
   display: inline-block;
 }
 
-/* ---- Logout button theme-aware styling ---- */
+/* Logout button base styling */
 #logout-btn {
-  background-color: var(--btn-bg, #444);
-  color: var(--btn-text, #fff);
-  border: none;
+  background-color: transparent; /* let theme override */
+  color: inherit;                /* inherit text color from parent */
+  border: 1px solid rgba(255,255,255,0.12);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
 }
 
-#logout-btn:hover {
-  opacity: 0.85;
-}
-
 /* Light theme overrides */
 body.light #logout-btn {
   background-color: #eee;
   color: #222;
+  border-color: rgba(0,0,0,0.12);
 }
 
 /* Dark theme overrides */
 body.dark #logout-btn {
   background-color: #444;
   color: #fff;
+  border-color: rgba(255,255,255,0.12);
+}
+
+#logout-btn:hover {
+  opacity: 0.9;
 }
