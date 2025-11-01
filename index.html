@@ -1,38 +1,45 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>GitHub Timelines (csndl-iitd)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Timeliner</title>
+  <link rel="icon" href="https://github.githubassets.com/favicons/favicon.png" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body class="light">
   <header>
-    <h1>GitHub Timelines — csndl-iitd</h1>
-    <div id="status"><span id="statusText">Not signed in</span><span id="statusActions"></span></div>
+    <div class="left">
+      <h1>GitHub Timeliner</h1>
+      <div>
+        <label>Theme:
+          <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div>
+      <label><input type="checkbox" id="showClosed"> Show closed</label>
+      <label><input type="checkbox" id="showNotPlanned"> Show “not planned”</label>
+    </div>
   </header>
 
-  <main id="content">
-    <section id="auth-section">
-      <div class="controls">
-        <button id="oauthButton">Sign in with GitHub (Device Flow)</button>
-        <button id="patButton">Paste Personal Access Token</button>
-        <label for="theme">Theme:</label>
-        <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select>
-      </div>
-      <div class="toggles">
-        <label><input id="showClosed" type="checkbox" checked /> Show closed</label>
-        <label><input id="showNotPlanned" type="checkbox" checked /> Show 'not planned'</label>
-      </div>
-    </section>
+  <div id="statusBar">
+    <span id="statusText">Not signed in</span>
+    <span id="statusActions"></span>
+  </div>
 
-    <div id="contentArea"></div>
-  </main>
+  <div id="auth-section" class="intro">
+    <p><strong>Authenticate with GitHub</strong> to access your organization’s private repositories.</p>
+    <button id="oauthButton">Sign in with GitHub (Device Flow)</button>
+    <button id="patButton">Use Personal Access Token</button>
+  </div>
 
-  <script>
-    // configure this to your Worker URL after deployment
-    window.__PROXY_URL__ = 'https://timeliner.gsaurabhr.workers.dev';
-  </script>
+  <main id="content"></main>
+
   <script src="app.js"></script>
 </body>
 </html>

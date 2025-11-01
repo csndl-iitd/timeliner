@@ -1,17 +1,126 @@
-:root { --muted: #9ca3af; }
-body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:0; padding:12px; }
-body.light { background:#fff; color:#111; }
-body.dark { background:#071029; color:#e0e0e0; }
-header { position: fixed; top:0; left:0; width: calc(100% - 24px); z-index:1000; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; background: rgba(255,255,255,0.9); box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-.controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-button { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
-#content { padding-top:120px; height: calc(100vh - 80px); overflow-y:auto; box-sizing:border-box; }
-#contentArea { padding:12px; }
-.intro, .repo-placeholder { background: rgba(0,0,0,0.03); padding:12px; border-radius:8px; margin-bottom:12px; }
-.timeline { background: rgba(0,0,0,0.02); padding:12px; border-radius:8px; margin-bottom:14px; overflow:visible; }
-.repo-title { font-size:1.05rem; margin-bottom:8px; }
-.footer { font-size:12px; color:var(--muted); margin-top:12px; }
-.repo-selected { outline: 2px solid #3b82f6; background: rgba(59,130,246,0.05); }
-#status { display:flex; align-items:center; gap:10px; }
-#statusActions { margin-left:8px; }
-#logout-btn { padding:6px 10px; border-radius:6px; border:0; cursor:pointer; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Light/Dark variables */
+:root {
+  --bg-light: #ffffff;
+  --fg-light: #222222;
+  --bg-dark: #121212;
+  --fg-dark: #e0e0e0;
+}
+
+body.light {
+  --bg: var(--bg-light);
+  --fg: var(--fg-light);
+}
+
+body.dark {
+  --bg: var(--bg-dark);
+  --fg: var(--fg-dark);
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+header .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Status bar */
+#statusBar {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#statusActions button {
+  margin-left: 6px;
+  background: #e5534b;
+}
+#statusActions button:hover {
+  background: #d93c3c;
+}
+
+/* Content */
+#content {
+  padding: 16px;
+}
+
+.intro {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px dashed #888;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Timeline blocks */
+.timeline {
+  margin-bottom: 2rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(127,127,127,0.3);
+  border-radius: 8px;
+}
+.repo-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background: #2c974b;
+  color: white;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+button:hover {
+  background: #2ea043;
+}
+
+/* Checkboxes + selects */
+select, input[type=checkbox] {
+  margin-left: 6px;
+}
+
+/* SVG charts */
+svg {
+  width: 100%;
+  overflow: visible;
+}
+
+.timeline.repo-selected { background: rgba(100,181,246,0.12); outline:1px solid rgba(100,181,246,0.3); }
