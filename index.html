@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>GitHub Timelines (csndl-iitd)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="light">
+  <header>
+    <h1>GitHub Timelines — csndl-iitd</h1>
+    <div id="status"><span id="statusText">Not signed in</span><span id="statusActions"></span></div>
+  </header>
+
+  <main id="content">
+    <section id="auth-section">
+      <div class="controls">
+        <button id="oauthButton">Sign in with GitHub (Device Flow)</button>
+        <button id="patButton">Paste Personal Access Token</button>
+        <label for="theme">Theme:</label>
+        <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select>
+      </div>
+      <div class="toggles">
+        <label><input id="showClosed" type="checkbox" checked /> Show closed</label>
+        <label><input id="showNotPlanned" type="checkbox" checked /> Show 'not planned'</label>
+      </div>
+    </section>
+
+    <div id="contentArea"></div>
+  </main>
+
+  <script>
+    // configure this to your Worker URL after deployment
+    window.__PROXY_URL__ = 'https://timeliner.gsaurabhr.workers.dev';
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
