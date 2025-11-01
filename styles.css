@@ -5,7 +5,7 @@ body.dark { background:#071029; color:#e0e0e0; }
 header { position: fixed; top:0; left:0; width: calc(100% - 24px); z-index:1000; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; background: rgba(255,255,255,0.9); box-shadow:0 2px 6px rgba(0,0,0,0.08); }
 .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 button { padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:linear-gradient(90deg,#2563eb,#60a5fa); color:#04263b; }
-#content { padding-top:80px; height: calc(100vh - 80px); overflow-y:auto; box-sizing:border-box; }
+#content { padding-top:120px; height: calc(100vh - 80px); overflow-y:auto; box-sizing:border-box; }
 #contentArea { padding:12px; }
 .intro, .repo-placeholder { background: rgba(0,0,0,0.03); padding:12px; border-radius:8px; margin-bottom:12px; }
 .timeline { background: rgba(0,0,0,0.02); padding:12px; border-radius:8px; margin-bottom:14px; overflow:visible; }
